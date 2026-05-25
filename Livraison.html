@@ -1692,6 +1692,7 @@ function WhyNotAllModal({ open, onClose }) {
 /* ============ APP ============ */
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "viewport": "desktop",
+  "consolidationFeature": true,
   "consolidation": false,
   "showSkipModal": false,
   "showWhyModal": false
@@ -1701,7 +1702,8 @@ function App() {
   const [tweaks, setTweak] = window.useTweaks
     ? window.useTweaks(TWEAK_DEFAULTS)
     : [TWEAK_DEFAULTS, () => {}];
-  const consolidation = !!tweaks.consolidation;
+  const consolidationFeature = tweaks.consolidationFeature !== false;
+  const consolidation = consolidationFeature && !!tweaks.consolidation;
   const setConsolidation = (v) => setTweak("consolidation", v);
 
   const [toasters, setToasters] = useState([
@@ -1759,7 +1761,7 @@ function App() {
   const _fmt = (n) => n.toLocaleString("fr-FR").replace(",", " ");
 
   const handleSubmit = () => {
-    if (!consolidation) setShowSkip(true);
+    if (consolidationFeature && !consolidation) setShowSkip(true);
   };
 
   const content = (
@@ -1775,7 +1777,9 @@ function App() {
               </Toaster>
             ))}
           </div>
-          <ConsolidationCard on={consolidation} setOn={setConsolidation} onWhy={() => setShowWhy(true)} />
+          {consolidationFeature && (
+            <ConsolidationCard on={consolidation} setOn={setConsolidation} onWhy={() => setShowWhy(true)} />
+          )}
           {(consolidation
             ? [...DELIVERY_GROUPS].sort((a,b) => (a.consolidatedOrder||99) - (b.consolidatedOrder||99))
             : DELIVERY_GROUPS
@@ -1838,6 +1842,13 @@ function App() {
       {isMobile ? <div className="viewport-mobile">{content}</div> : content}
       {window.TweaksPanel && (
         <window.TweaksPanel>
+          <window.TweakSection title="Variante de page">
+            <window.TweakToggle
+              label="Fonctionnalité regroupement"
+              value={consolidationFeature}
+              onChange={v => setTweak("consolidationFeature", v)}
+            />
+          </window.TweakSection>
           <window.TweakSection title="Affichage">
             <window.TweakRadio
               label="Viewport"
@@ -1849,17 +1860,21 @@ function App() {
               ]}
             />
           </window.TweakSection>
-          <window.TweakSection title="État livraison">
-            <window.TweakToggle
-              label="Regroupement actif"
-              value={tweaks.consolidation}
-              onChange={v => setTweak("consolidation", v)}
-            />
-          </window.TweakSection>
-          <window.TweakSection title="Overlays">
-            <window.TweakButton label="Modale : continuer sans regrouper" onClick={() => setShowSkip(true)} />
-            <window.TweakButton label="Modale : pourquoi pas tout regrouper" onClick={() => setShowWhy(true)} />
-          </window.TweakSection>
+          {consolidationFeature && (
+            <window.TweakSection title="État livraison">
+              <window.TweakToggle
+                label="Regroupement actif"
+                value={tweaks.consolidation}
+                onChange={v => setTweak("consolidation", v)}
+              />
+            </window.TweakSection>
+          )}
+          {consolidationFeature && (
+            <window.TweakSection title="Overlays">
+              <window.TweakButton label="Modale : continuer sans regrouper" onClick={() => setShowSkip(true)} />
+              <window.TweakButton label="Modale : pourquoi pas tout regrouper" onClick={() => setShowWhy(true)} />
+            </window.TweakSection>
+          )}
         </window.TweaksPanel>
       )}
     </>
