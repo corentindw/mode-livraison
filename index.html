@@ -1132,7 +1132,7 @@ function ProductTunnel({ product }) {
             {product.offert ? (
               <>
                 <span className="product-tunnel__price-strike">{product.priceStrike || product.price}&nbsp;€</span>
-                <span className="product-tunnel__promo-flag">Offert</span>
+                <span className="product-tunnel__promo-flag product-tunnel__promo-flag--offert">Offert</span>
               </>
             ) : (
               <>
@@ -1173,7 +1173,7 @@ function DeliveryOption({ option, selected, onSelect }) {
             )}
           </div>
           <span className={`selection-price ${option.free ? "free" : ""}`}>
-            {option.free ? <span className="product-tunnel__promo-flag">Offert</span> : `${option.price}\u00A0€`}
+            {option.free ? <span className="product-tunnel__promo-flag product-tunnel__promo-flag--offert">Offert</span> : `${option.price}\u00A0€`}
           </span>
         </div>
 
@@ -1961,7 +1961,17 @@ function App() {
       <Header currentStep="livraison" />
       <main className="main">
         <section className="col-products">
-          <div className="section-title">Livraison</div>
+          <button type="button" className="back-link" aria-label="Retour">
+            <M.IconArrowLeft />
+            <span>Retour</span>
+          </button>
+          <div className="step-collapsed">
+            <span className="step-collapsed__title">1. Votre lieu de livraison et de facturation</span>
+            <button type="button" className="step-collapsed__edit" aria-label="Modifier l'adresse">
+              <Icon.Pencil />
+            </button>
+          </div>
+          <div className="section-title">2. Votre mode de livraison</div>
           <div className="toasters">
             {toasters.map(tt => (
               <Toaster key={tt.id} kind={tt.kind}>
